@@ -1,74 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        div{
-            width: 100px;
-            height: 100px;
-            background-color: red;
-            position: absolute;
-        }
-    </style>
-</head>
-<body>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title></title>
+		<style type="text/css">
 
-<div></div>
+		</style>
+		<script type="text/javascript">
+			var auths = null;
+			var aweixin = null; // 调用plus.oauth.getServices获取保存
 
-<script>
+			// 监听plusready事件  
 
-    //获取需要拖拽的元素
-    var divs = document.querySelector('div');
+			document.addEventListener("plusready", function() {
 
-    //元素的鼠标落下事件
-    divs.onmousedown = function(ev){
+				// 扩展API加载完毕，现在可以正常调用扩展API
 
-        //event的兼容性
-        var ev = ev||event;
+				plus.oauth.getServices(function(services) {
 
-        //获取鼠标按下的坐标
-        var x1 = ev.clientX;
-        var y1 = ev.clientY;
+					auths = services;
+					aweixin = services['weixin'];
 
-        //获取元素的left，top值
-        var l = divs.offsetLeft;
-        var t = divs.offsetTop;
+					// plus.nativeUI.alert("登录授权：" + JSON.stringify(auths));
 
-        //给可视区域添加鼠标的移动事件
-        document.onmousemove = function(ev){
+				}, function(e) {
 
-            //event的兼容性
-            var ev = ev||event;
+					// alert("获取登录服务列表失败：" + e.message + " - " + e.code);
 
-            //获取鼠标移动时的坐标
-            var x2 = ev.clientX;
-            var y2 = ev.clientY;
+				});
 
-            //计算出鼠标的移动距离
-            var x = x2-x1;
-            var y = y2-y1;
 
-            //移动的数值与元素的left，top相加，得出元素的移动的距离
-            var lt = y+t;
-            var ls = x+l;
+				// 分享功能
+				var Intent = null,
+					File = null,
+					Uri = null,
+					main = null;
+				var shares = null;
+				var shareImageUrl = '';
 
-            //更改元素的left，top值
-            divs.style.top = lt+'px';
-            divs.style.left = ls+'px';
+				updateSerivces();
+				if (plus.os.name == "Android") {
+					Intent = plus.android.importClass("android.content.Intent");
+					File = plus.android.importClass("java.io.File");
+					Uri = plus.android.importClass("android.net.Uri");
+					main = plus.android.runtimeMainActivity();
+				}
 
-        }
+			}, false);
 
-        //清除
-        document.onmouseup = function(ev){
+			function updateSerivces() {
+				plus.share.getServices(function(s) {
+					shares = {};
+					for (var i in s) {
+						var t = s[i];
+						shares[t.id] = t;
+					}
+					// alert("获取分享服务列表成功"+JSON.stringify(shares));
 
-            document.onmousemove = null;
+				}, function(e) {
+					// alert("获取分享服务列表失败：" + e.message);
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<button>分享给朋友</button>
+		<button>分享到朋友圈</button>
+	</body>
+	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		// document.addEventListener("plusready", function() {
 
-        }
+			
 
-    }
+		// })
 
-</script>
+		$("button").click(function(){
+              share($(this).index());
+		})
 
-</body>
+		// 微信分享
+		function share(index) {
+			var ids = [{
+					id: "weixin",
+					ex: "WXSceneSession" /*微信好友*/
+				}, {
+					id: "weixin",
+					ex: "WXSceneTimeline" /*微信朋友圈*/
+				}],
+				bts = [{
+					title: "发送给微信好友",
+				}, {
+					title: "分享到微信朋友圈"
+				}];
+			 btns = [];
+			 
+			//     plus.nativeUI.actionSheet({
+			//             cancel: "取消",
+			//             buttons: bts
+
+			// },function(e) {
+				
+				// alert(JSON.stringify(e))
+			//   var i = e.index;
+			
+				var i = index-0;
+			
+			// alert('i:' + i)
+			if (i >= 0) {
+				
+				var id = ids[index].id;
+				var ex = ids[index].ex
+				var s = null;
+				
+				if (!id || !(s = shares[id])) {
+					alert("无效的分享服务！");
+					return;
+				}
+
+                 
+				if (s.authenticated) {
+					// alert("---已授权---");
+					var msg = {
+						content: '大河票务',
+						href: 'http://www.dahepiao.com/jingqulvyou1/2018060738069.html',
+						//分享链接
+						title: '洛阳天河大峡谷',
+						//标题
+						content: '悠然世外桃花源，不及人间江南春！中原人自己的活水真山好温泉，腾腾临浴日，蒸蒸热浪生，如梦如幻，欲醉欲仙，妙不可',
+						//分享描述
+						thumbs: ['./img/logo2.png'],
+
+						extra: {
+							scene:ex
+						}
+					};
+					s.send(msg, function() {
+						alert("分享成功!");
+					}, function(e) {
+						alert("分享失败!");
+					});
+				}
+			}
+
+			// }
+			// );
+		}
+	</script>
 </html>
