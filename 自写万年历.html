@@ -48,7 +48,7 @@
  
 </body>
 <script src="./jQuery-v1.7.2.js"></script>
-<script src="./clender.js"></script>
+<script src="./clender.min.js"></script>
 <script>
     var obj = {
         info: [
@@ -57,7 +57,7 @@
                 title: '演出'
             },
             {
-                time: "2019-12-9",
+                time: "2019-12-31",
                 title: '哈哈'
             },
             {
@@ -72,7 +72,7 @@
         // clickColor:'pink',
         // weekBackgroundColor:'red',
         on:function(res){
-             console.log(res);
+             console.log(res+"on");
             //  console.log(new Date("2019-12-7"))
         }
 
@@ -80,8 +80,13 @@
 
 
     // function Clender(el, obj) {
+    //     obj=obj?obj:{};
     //     var clickColor=obj.clickColor?obj.clickColor:'red';
     //     var weekBackgroundColor=obj.weekBackgroundColor?obj.weekBackgroundColor:'rgb(221, 221, 221)';
+    //     obj.info=obj.info?obj.info:false;
+
+    //     obj.on=obj.on?obj.on:function fn(res){console.log(res)};
+
     //     var that = this;
     //     var num = 0;
     //     var html = '';
@@ -143,13 +148,16 @@
     //             }).html("今日");
     //         }
 
-    //         for (let item of obj.info) {
+    //        if(obj.info){
+    //            for (let item of obj.info) {
     //             if (item.time.split("-")[0] == year && item.time.split("-")[1] == month) {
     //                 var dd = item.time.split("-")[2];
     //                 var html = "<span class='notes'>" + item.title + "</span>";
     //                 that.el.find('.clender_day').children().eq(dd - 1).append(html);
     //             }
     //         }
+    //        }
+            
 
     //         var date = new Date(year, (month - 1), 1)
     //         that.el.find('.clender_day').children().eq(0).css({
@@ -275,7 +283,8 @@
     //     }
     // }
 
-    var ad = new Clender(".clender", obj);
+
+    var ad = new Clender(".clender",obj);
 
 
  
